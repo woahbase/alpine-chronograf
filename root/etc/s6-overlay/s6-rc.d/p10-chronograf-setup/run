@@ -1,0 +1,19 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+vecho () { if [ "${S6_VERBOSITY:-1}" -gt 0 ]; then echo "[$0] $@"; fi; }
+
+vecho "Ensure configuration directories exist";
+mkdir -p \
+    /usr/share/chronograf \
+    /var/lib/chronograf \
+    /var/log/chronograf \
+    ;
+
+# fix permissions
+vecho "Fixing permissions.";
+chown -R ${S6_USER:-alpine}:${PGID:-1000} \
+    /usr/share/chronograf \
+    /var/lib/chronograf \
+    /var/log/chronograf \
+    ;

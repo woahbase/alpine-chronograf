@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+# CHRONOGRAF_ARGS="${CHRONOGRAF_ARGS:-}";
+# no arguments passed by default, use environment vars instead
+
+s6-setuidgid ${S6_USER:-alpine} \
+exec \
+    /usr/bin/chronograf \
+    ${CHRONOGRAF_ARGS} \
+    ;
