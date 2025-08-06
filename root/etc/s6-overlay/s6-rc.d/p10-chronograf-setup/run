@@ -3,17 +3,25 @@ set -e
 
 vecho () { if [ "${S6_VERBOSITY:-1}" -gt 0 ]; then echo "[$0] $@"; fi; }
 
+BOLT_PATH="${BOLT_PATH:-/var/lib/chronograf/chronograf-v1.db}";
+CANNED_PATH="${CANNED_PATH:-/usr/share/chronograf/canned}";
+RESOURCES_PATH="${RESOURCES_PATH:-/usr/share/chronograf/resources}";
+
 vecho "Ensure configuration directories exist";
 mkdir -p \
-    /usr/share/chronograf \
-    /var/lib/chronograf \
-    /var/log/chronograf \
+    $(dirname ${BOLT_PATH}) \
+    ${CANNED_PATH} \
+    ${RESOURCES_PATH} \
     ;
 
 # fix permissions
-vecho "Fixing permissions.";
-chown -R ${S6_USER:-alpine}:${PGID:-1000} \
-    /usr/share/chronograf \
-    /var/lib/chronograf \
-    /var/log/chronograf \
-    ;
+if [ -z "${CHRONOGRAF_SKIP_PERMFIX}" ] \
+&& [ "X${EUID}" == "X0" ]; # requires root
+then
+    vecho "Fixing permissions.";
+    chown -R ${S6_USER:-alpine}:${PGID:-1000} \
+        $(dirname ${BOLT_PATH}) \
+        ${CANNED_PATH} \
+        ${RESOURCES_PATH} \
+        ;
+fi;
